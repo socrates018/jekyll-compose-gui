@@ -594,7 +594,6 @@ class ModernJekyllGUI:
             draft_file = drafts[dialog.result]
             date = datetime.now().strftime('%Y-%m-%d')
             
-            # Move and rename file
             content = draft_file.read_text(encoding='utf-8')
             title_match = re.search(r'^title:\s*(.+)$', content, re.MULTILINE)
             title = title_match.group(1).strip().strip('"\'') if title_match else draft_file.stem
@@ -612,6 +611,7 @@ class ModernJekyllGUI:
             
             self.update_status(f"🚀 Published: {post_path.name}")
             self.refresh_files()
+            messagebox.showinfo("Published", f"Draft '{draft_file.name}' has been moved to posts as '{post_path.name}'.")
     
     def unpublish_post(self):
         """Quick unpublish post"""
@@ -629,20 +629,17 @@ class ModernJekyllGUI:
                                  [p.name for p in posts])
         if dialog.result is not None:
             post_file = posts[dialog.result]
-            
             # Remove date prefix and move to drafts
             name_parts = post_file.name.split('-', 3)
             new_name = name_parts[3] if len(name_parts) >= 4 else post_file.name
-            
             drafts_path = Path(self.jekyll_root) / "_drafts"
             drafts_path.mkdir(exist_ok=True)
             draft_path = drafts_path / new_name
-            
             draft_path.write_text(post_file.read_text(encoding='utf-8'), encoding='utf-8')
             post_file.unlink()
-            
             self.update_status(f"📦 Unpublished: {draft_path.name}")
             self.refresh_files()
+            messagebox.showinfo("Unpublished", f"Post '{post_file.name}' has been moved to drafts as '{new_name}'.")
     
     def build_site(self):
         """Build Jekyll site"""
@@ -722,6 +719,9 @@ class ModernListDialog:
         
         if items:
             self.listbox.selection_set(0)
+
+        # Allow double-click to select
+        self.listbox.bind('<Double-Button-1>', lambda e: self.ok())
         
         # Buttons
         btn_frame = tk.Frame(content, bg='#f8fafc')
@@ -730,7 +730,7 @@ class ModernListDialog:
         tk.Button(btn_frame, text="Cancel", command=self.cancel,
                  bg='#e5e7eb', fg='#374151', relief='flat', padx=20, pady=8,
                  font=('Segoe UI', 10)).pack(side='right', padx=(10, 0))
-        tk.Button(btn_frame, text="Select", command=self.ok,
+        tk.Button(btn_frame, text="OK", command=self.ok,
                  bg='#2563eb', fg='white', relief='flat', padx=20, pady=8,
                  font=('Segoe UI', 10, 'bold')).pack(side='right')
         
