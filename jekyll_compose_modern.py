@@ -14,10 +14,14 @@ import subprocess
 import webbrowser
 from pathlib import Path
 import json
+import sys
 
 class ModernJekyllGUI:
     def __init__(self):
         self.root = tk.Tk()
+        self.jekyll_root = self.find_jekyll_root()
+        if len(sys.argv) > 1:
+            self.jekyll_root = sys.argv[1]
         self.setup_window()
         self.setup_variables()
         self.setup_modern_style()
@@ -451,6 +455,8 @@ class ModernJekyllGUI:
     # Utility methods (simplified)
     def find_jekyll_root(self):
         """Find Jekyll root directory"""
+        if len(sys.argv) > 1:
+            return sys.argv[1]
         current = Path.cwd()
         for path in [current] + list(current.parents):
             if (path / '_config.yml').exists():

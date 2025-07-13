@@ -2,6 +2,8 @@
 echo Starting Jekyll Compose - Modern Edition...
 echo.
 
+set DEFAULT_DIR=C:\Users\socra\Documents\GitHub\socrates018.github.io
+
 REM Check if Python is available
 python --version >nul 2>&1
 if errorlevel 1 (
@@ -19,7 +21,7 @@ if not exist ".jekyll_gui_deps_installed" (
 )
 
 REM Start the modern GUI
-python jekyll_compose_modern.py
+python jekyll_compose_modern.py "%DEFAULT_DIR%"
 
 if errorlevel 1 (
     echo.
